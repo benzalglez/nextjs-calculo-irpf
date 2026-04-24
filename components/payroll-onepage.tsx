@@ -88,6 +88,28 @@ function FlowRow({
   );
 }
 
+function ReceiptSlice({
+  label,
+  value,
+  width,
+  variant,
+}: {
+  label: string;
+  value: string;
+  width: number;
+  variant: "net" | "worker" | "company";
+}) {
+  return (
+    <div className={`receipt-slice receipt-${variant}`}>
+      <span style={{ width: `${width}%` }} aria-hidden="true" />
+      <div>
+        <strong>{value}</strong>
+        <small>{label}</small>
+      </div>
+    </div>
+  );
+}
+
 export function PayrollOnePage() {
   const [salary, setSalary] = useState(DEFAULT_SALARY);
   const [salaryInput, setSalaryInput] = useState(String(DEFAULT_SALARY));
@@ -105,6 +127,11 @@ export function PayrollOnePage() {
   const deltaLabel = currentYearLosesNetSalary
     ? `Pérdida neta frente a ${comparisonYear}`
     : `Mejora neta frente a ${comparisonYear}`;
+  const netOverLaborCost = payroll.laborCost > 0 ? payroll.netSalary / payroll.laborCost : 0;
+  const workerWithholding = payroll.employeeContribution + payroll.finalIrpf;
+  const workerWithholdingOverCost = payroll.laborCost > 0 ? workerWithholding / payroll.laborCost : 0;
+  const employerContributionOverCost = payroll.laborCost > 0 ? payroll.employerContribution / payroll.laborCost : 0;
+  const takeHomePerHundred = Math.round(netOverLaborCost * 100);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -160,6 +187,10 @@ export function PayrollOnePage() {
       </a>
       <main>
       <section className="hero-section">
+        <div className="brand-lockup" aria-label="Marca de la aplicación">
+          <span>IRPF</span>
+          <strong>LAB</strong>
+        </div>
         <div className="hero-media" aria-hidden="true" />
         <nav className="topbar" aria-label="Navegación principal">
           <a href="#simulador">Simulador</a>
@@ -168,21 +199,40 @@ export function PayrollOnePage() {
         </nav>
 
         <div className="hero-content">
-          <p className="eyebrow">Auditoría de nóminas 2012-2026</p>
-          <h1>Calcula el coste real del salario en España</h1>
+          <p className="eyebrow">Auditoría salarial 2012-2026</p>
+          <h1>La nómina, abierta en canal</h1>
           <p className="hero-lede">
-            Una onepage interactiva basada en tu motor: cotizaciones de empresa y trabajador, IRPF, neto anual, neto
-            mensual y comparativa de poder adquisitivo ajustada por IPC.
+            Un laboratorio para ver cuánto cuesta contratar, cuánto se queda Hacienda y Seguridad Social, y cuánto
+            poder adquisitivo se ha evaporado frente a años anteriores.
           </p>
           <div className="hero-actions">
             <a href="#simulador" className="primary-action">
-              Probar salario
+              Abrir mi nómina
             </a>
             <a href="#metodo" className="secondary-action">
-              Ver parámetros
+              Ver reglas fiscales
             </a>
           </div>
         </div>
+        <aside className="hero-verdict" aria-label="Diagnóstico rápido de la nómina actual">
+          <p>Veredicto rápido</p>
+          <strong>{takeHomePerHundred} € netos</strong>
+          <span>por cada 100 € de coste laboral</span>
+          <div className="verdict-ledger">
+            <div>
+              <small>Coste empresa</small>
+              <b>{formatEuro(payroll.laborCost)}</b>
+            </div>
+            <div>
+              <small>Neto anual</small>
+              <b>{formatEuro(payroll.netSalary)}</b>
+            </div>
+            <div>
+              <small>Cuña fiscal</small>
+              <b>{formatPercent(1 - netOverLaborCost)}</b>
+            </div>
+          </div>
+        </aside>
       </section>
 
       <section id="simulador" className="tool-section">
@@ -263,6 +313,32 @@ export function PayrollOnePage() {
           </aside>
 
           <div className="results-panel">
+            <div className="receipt-panel" aria-label="Reparto del coste laboral">
+              <div>
+                <p className="receipt-kicker">Radiografía del coste</p>
+                <h3>De {formatEuro(payroll.laborCost)} pagados por la empresa, {formatEuro(payroll.netSalary)} llegan netos.</h3>
+              </div>
+              <div className="receipt-stack">
+                <ReceiptSlice
+                  label="Neto trabajador"
+                  value={formatPercent(netOverLaborCost)}
+                  width={netOverLaborCost * 100}
+                  variant="net"
+                />
+                <ReceiptSlice
+                  label="SS trabajador + IRPF"
+                  value={formatPercent(workerWithholdingOverCost)}
+                  width={workerWithholdingOverCost * 100}
+                  variant="worker"
+                />
+                <ReceiptSlice
+                  label="SS empresa"
+                  value={formatPercent(employerContributionOverCost)}
+                  width={employerContributionOverCost * 100}
+                  variant="company"
+                />
+              </div>
+            </div>
             <div className="metrics-grid">
               <Metric label="Coste laboral" value={formatEuro(payroll.laborCost)} />
               <Metric label="Salario neto anual" value={formatEuro(payroll.netSalary)} tone="positive" />

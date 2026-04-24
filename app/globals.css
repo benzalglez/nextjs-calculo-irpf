@@ -8,6 +8,8 @@
   --teal-deep: #075b5d;
   --coral: #e85d4f;
   --amber: #c68a25;
+  --violet: #5b4b8a;
+  --graphite: #20272b;
   --mint: #dff5ee;
   --steel: #eef3f4;
   --shadow: 0 24px 70px rgba(19, 33, 38, 0.14);
@@ -80,6 +82,8 @@ select:focus-visible {
   position: relative;
   min-height: 82vh;
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+  gap: clamp(24px, 5vw, 72px);
   align-items: center;
   padding: 28px clamp(18px, 5vw, 76px) 56px;
   isolation: isolate;
@@ -115,6 +119,35 @@ select:focus-visible {
   backdrop-filter: blur(18px);
 }
 
+.brand-lockup {
+  position: absolute;
+  top: calc(24px + env(safe-area-inset-top));
+  left: clamp(18px, 5vw, 76px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(17, 19, 21, 0.13);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 8px 12px;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 950;
+  backdrop-filter: blur(18px);
+}
+
+.brand-lockup span {
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--white);
+  padding: 5px 8px;
+  font-size: 0.76rem;
+}
+
+.brand-lockup strong {
+  letter-spacing: 0.08em;
+}
+
 .topbar a {
   border-radius: 999px;
   padding: 9px 15px;
@@ -131,6 +164,71 @@ select:focus-visible {
 .hero-content {
   width: min(760px, 100%);
   padding-top: 84px;
+}
+
+.hero-verdict {
+  align-self: end;
+  display: grid;
+  gap: 12px;
+  width: min(430px, 100%);
+  border: 1px solid rgba(17, 19, 21, 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(17, 19, 21, 0.96), rgba(32, 39, 43, 0.92)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: auto, 18px 18px;
+  color: var(--white);
+  padding: 24px;
+  box-shadow: 0 28px 70px rgba(17, 19, 21, 0.28);
+}
+
+.hero-verdict p,
+.receipt-kicker {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-verdict > strong {
+  font-size: clamp(2.5rem, 5vw, 4.2rem);
+  line-height: 0.92;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-verdict > span {
+  color: rgba(255, 255, 255, 0.74);
+  font-weight: 800;
+}
+
+.verdict-ledger {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.verdict-ledger div {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 13px;
+}
+
+.verdict-ledger small {
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 800;
+}
+
+.verdict-ledger b {
+  overflow-wrap: break-word;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .eyebrow {
@@ -324,6 +422,80 @@ h2 {
 
 .results-panel {
   padding: 18px;
+}
+
+.receipt-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(32, 39, 43, 0.98), rgba(15, 91, 93, 0.92)),
+    repeating-linear-gradient(0deg, transparent, transparent 11px, rgba(255, 255, 255, 0.06) 12px);
+  color: var(--white);
+  padding: 20px;
+}
+
+.receipt-panel h3 {
+  margin: 10px 0 0;
+  max-width: 560px;
+  font-size: clamp(1.45rem, 2.4vw, 2.45rem);
+  line-height: 1.03;
+  text-wrap: balance;
+}
+
+.receipt-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.receipt-slice {
+  position: relative;
+  display: grid;
+  min-height: 58px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.receipt-slice > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  min-width: 2px;
+}
+
+.receipt-slice div {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.receipt-slice strong {
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.receipt-slice small {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 850;
+}
+
+.receipt-net > span {
+  background: var(--teal);
+}
+
+.receipt-worker > span {
+  background: var(--coral);
+}
+
+.receipt-company > span {
+  background: var(--amber);
 }
 
 .metrics-grid,
@@ -529,6 +701,7 @@ h2 {
 
 @media (max-width: 980px) {
   .hero-section {
+    grid-template-columns: 1fr;
     min-height: 86vh;
   }
 
@@ -540,7 +713,8 @@ h2 {
 
   .section-heading,
   .calculator-layout,
-  .inflation-layout {
+  .inflation-layout,
+  .receipt-panel {
     grid-template-columns: 1fr;
   }
 
@@ -553,9 +727,14 @@ h2 {
 
 @media (max-width: 640px) {
   .topbar {
+    top: calc(70px + env(safe-area-inset-top));
     left: 18px;
     right: 18px;
     justify-content: center;
+  }
+
+  .brand-lockup {
+    left: 18px;
   }
 
   .topbar a {
@@ -564,13 +743,14 @@ h2 {
   }
 
   .hero-section {
-    min-height: min(680px, 100svh);
+    min-height: auto;
     align-items: end;
+    padding-top: 120px;
     padding-bottom: 42px;
   }
 
   .hero-content {
-    padding-top: 110px;
+    padding-top: 0;
   }
 
   h1 {
@@ -593,6 +773,19 @@ h2 {
 
   .comparison-grid .metric {
     min-height: 108px;
+  }
+
+  .hero-verdict,
+  .receipt-panel {
+    padding: 18px;
+  }
+
+  .verdict-ledger {
+    grid-template-columns: 1fr;
+  }
+
+  .receipt-slice div {
+    display: grid;
   }
 
   .flow-copy {
