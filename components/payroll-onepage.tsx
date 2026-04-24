@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   YEARS,
   calculatePayroll,
@@ -25,6 +25,14 @@ function clampSalary(value: number) {
   return Math.min(MAX_SALARY, Math.max(MIN_SALARY, Math.round(value)));
 }
 
+function clampYear(value: number, fallback = DEFAULT_YEAR) {
+  return YEARS.includes(value) ? value : fallback;
+}
+
+function clampComparisonYear(value: number, fallback = DEFAULT_COMPARISON_YEAR) {
+  return COMPARISON_YEARS.includes(value) ? value : fallback;
+}
+
 function formatSignedEuro(value: number, digits = 0) {
   if (value > 0) {
     return `+${formatEuro(value, digits)}`;
@@ -44,7 +52,7 @@ function Metric({
 }: {
   label: string;
   value: string;
-  tone?: "default" | "positive" | "warning";
+  tone?: "default" | "positive" | "warning" | "loss";
 }) {
   return (
     <article className={`metric metric-${tone}`}>
@@ -54,11 +62,21 @@ function Metric({
   );
 }
 
-function FlowRow({ label, value, max }: { label: string; value: number; max: number }) {
+function FlowRow({
+  label,
+  value,
+  max,
+  variant = "neutral",
+}: {
+  label: string;
+  value: number;
+  max: number;
+  variant?: "neutral" | "cost" | "tax" | "net";
+}) {
   const width = max > 0 ? Math.max(2, Math.min(100, (value / max) * 100)) : 0;
 
   return (
-    <div className="flow-row">
+    <div className={`flow-row flow-${variant}`}>
       <div className="flow-copy">
         <span>{label}</span>
         <strong>{formatEuro(value)}</strong>
@@ -72,8 +90,10 @@ function FlowRow({ label, value, max }: { label: string; value: number; max: num
 
 export function PayrollOnePage() {
   const [salary, setSalary] = useState(DEFAULT_SALARY);
+  const [salaryInput, setSalaryInput] = useState(String(DEFAULT_SALARY));
   const [year, setYear] = useState(DEFAULT_YEAR);
   const [comparisonYear, setComparisonYear] = useState(DEFAULT_COMPARISON_YEAR);
+  const didReadUrl = useRef(false);
 
   const payroll = useMemo(() => calculatePayroll(salary, year), [salary, year]);
   const comparison = useMemo(() => compareInflation(salary, comparisonYear), [salary, comparisonYear]);
@@ -86,8 +106,59 @@ export function PayrollOnePage() {
     ? `Pérdida neta frente a ${comparisonYear}`
     : `Mejora neta frente a ${comparisonYear}`;
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const salaryParam = params.get("salary");
+    const yearParam = params.get("year");
+    const compareParam = params.get("compare");
+
+    if (salaryParam) {
+      const nextSalary = clampSalary(Number(salaryParam));
+      setSalary(nextSalary);
+      setSalaryInput(String(nextSalary));
+    }
+
+    if (yearParam) {
+      setYear(clampYear(Number(yearParam)));
+    }
+
+    if (compareParam) {
+      setComparisonYear(clampComparisonYear(Number(compareParam)));
+    }
+
+    didReadUrl.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!didReadUrl.current) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    params.set("salary", String(salary));
+    params.set("year", String(year));
+    params.set("compare", String(comparisonYear));
+    window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}${window.location.hash}`);
+  }, [salary, year, comparisonYear]);
+
+  function commitSalaryInput() {
+    const nextSalary = clampSalary(Number(salaryInput));
+    setSalary(nextSalary);
+    setSalaryInput(String(nextSalary));
+  }
+
+  function updateSalary(nextSalary: number) {
+    const clampedSalary = clampSalary(nextSalary);
+    setSalary(clampedSalary);
+    setSalaryInput(String(clampedSalary));
+  }
+
   return (
-    <main>
+    <>
+      <a className="skip-link" href="#simulador">
+        Saltar al simulador
+      </a>
+      <main>
       <section className="hero-section">
         <div className="hero-media" aria-hidden="true" />
         <nav className="topbar" aria-label="Navegación principal">
@@ -130,27 +201,44 @@ export function PayrollOnePage() {
               <span>Salario bruto anual</span>
               <input
                 type="number"
+                name="grossSalary"
+                inputMode="numeric"
+                autoComplete="off"
                 min={MIN_SALARY}
                 max={MAX_SALARY}
                 step={500}
-                value={salary}
-                onChange={(event) => setSalary(clampSalary(Number(event.target.value)))}
+                value={salaryInput}
+                aria-describedby="salary-help"
+                onBlur={commitSalaryInput}
+                onChange={(event) => setSalaryInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    commitSalaryInput();
+                  }
+                }}
               />
+              <small id="salary-help">Bruto anual en euros. La comparativa IPC toma este importe como salario 2026.</small>
             </label>
             <input
               className="salary-range"
               aria-label="Rango de salario bruto anual"
+              name="grossSalaryRange"
               type="range"
               min={MIN_SALARY}
               max={MAX_SALARY}
               step={500}
               value={salary}
-              onChange={(event) => setSalary(clampSalary(Number(event.target.value)))}
+              onChange={(event) => updateSalary(Number(event.target.value))}
             />
 
             <label className="field">
               <span>Año fiscal</span>
-              <select value={year} onChange={(event) => setYear(Number(event.target.value))}>
+              <select
+                name="fiscalYear"
+                autoComplete="off"
+                value={year}
+                onChange={(event) => setYear(clampYear(Number(event.target.value)))}
+              >
                 {YEARS.map((optionYear) => (
                   <option key={optionYear} value={optionYear}>
                     {optionYear}
@@ -165,6 +253,7 @@ export function PayrollOnePage() {
                   key={optionYear}
                   type="button"
                   className={optionYear === year ? "active" : undefined}
+                  aria-pressed={optionYear === year}
                   onClick={() => setYear(optionYear)}
                 >
                   {optionYear}
@@ -182,11 +271,11 @@ export function PayrollOnePage() {
             </div>
 
             <div className="flow-panel">
-              <FlowRow label="Coste total empresa" value={payroll.laborCost} max={maxFlowValue} />
+              <FlowRow label="Coste total empresa" value={payroll.laborCost} max={maxFlowValue} variant="cost" />
               <FlowRow label="Salario bruto" value={payroll.grossSalary} max={maxFlowValue} />
-              <FlowRow label="Cotización trabajador" value={payroll.employeeContribution} max={maxFlowValue} />
-              <FlowRow label="IRPF final" value={payroll.finalIrpf} max={maxFlowValue} />
-              <FlowRow label="Neto trabajador" value={payroll.netSalary} max={maxFlowValue} />
+              <FlowRow label="Cotización trabajador" value={payroll.employeeContribution} max={maxFlowValue} variant="tax" />
+              <FlowRow label="IRPF final" value={payroll.finalIrpf} max={maxFlowValue} variant="tax" />
+              <FlowRow label="Neto trabajador" value={payroll.netSalary} max={maxFlowValue} variant="net" />
             </div>
           </div>
         </div>
@@ -239,16 +328,21 @@ export function PayrollOnePage() {
           <p className="eyebrow">Comparativa IPC</p>
           <h2>El mismo salario visto en euros de 2026</h2>
           <p>
-            El salario de 2026 se compara contra el bruto nominal equivalente del año seleccionado, reexpresado en
-            euros de 2026. Si el resultado es negativo, has perdido salario neto frente a ese año.
+            La comparativa siempre toma el bruto introducido como salario 2026. Se contrasta contra el bruto nominal
+            equivalente del año histórico y ambos netos se expresan en euros de 2026.
           </p>
         </div>
 
         <div className="inflation-layout">
           <div className="control-panel slim">
             <label className="field">
-              <span>Comparar 2026 frente a</span>
-              <select value={comparisonYear} onChange={(event) => setComparisonYear(Number(event.target.value))}>
+              <span>Año histórico de referencia</span>
+              <select
+                name="comparisonYear"
+                autoComplete="off"
+                value={comparisonYear}
+                onChange={(event) => setComparisonYear(clampComparisonYear(Number(event.target.value)))}
+              >
                 {COMPARISON_YEARS.map((optionYear) => (
                   <option key={optionYear} value={optionYear}>
                     {optionYear}
@@ -258,9 +352,9 @@ export function PayrollOnePage() {
             </label>
             <div className="delta-badge" data-loss={currentYearLosesNetSalary}>
               <span>{deltaLabel}</span>
-              <strong>{formatSignedEuro(currentYearDelta)}</strong>
+              <strong>{formatSignedEuro(currentYearDelta)} al año</strong>
               <small>
-                2026 - {comparisonYear} = {formatSignedEuro(currentYearDelta)} al año ·{" "}
+                Neto 2026 - neto {comparisonYear} actualizado = {formatSignedEuro(currentYearDelta)} ·{" "}
                 {formatSignedEuro(currentMonthlyDelta)} al mes
               </small>
             </div>
@@ -274,7 +368,11 @@ export function PayrollOnePage() {
               tone="warning"
             />
             <Metric label={`Neto ${comparisonYear} actualizado a 2026`} value={formatEuro(comparison.adjustedNet)} />
-            <Metric label="Neto con reglas 2026" value={formatEuro(comparison.net2026)} tone="positive" />
+            <Metric
+              label="Neto 2026 con el bruto seleccionado"
+              value={formatEuro(comparison.net2026)}
+              tone={currentYearLosesNetSalary ? "loss" : "positive"}
+            />
           </div>
         </div>
       </section>
@@ -314,6 +412,7 @@ export function PayrollOnePage() {
           </article>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
