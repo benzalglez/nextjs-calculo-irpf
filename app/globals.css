@@ -419,12 +419,13 @@ h2 {
   gap: 7px;
   border-radius: 8px;
   padding: 20px;
-  background: #2b2520;
+  background: var(--teal-deep);
   color: var(--white);
 }
 
-.delta-badge[data-positive="true"] {
-  background: var(--teal-deep);
+.delta-badge[data-loss="true"] {
+  background: #a9362b;
+  box-shadow: 0 18px 46px rgba(169, 54, 43, 0.22);
 }
 
 .delta-badge span {

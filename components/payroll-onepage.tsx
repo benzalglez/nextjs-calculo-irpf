@@ -15,6 +15,7 @@ const MAX_SALARY = 100000;
 const DEFAULT_SALARY = 42000;
 const DEFAULT_YEAR = 2026;
 const DEFAULT_COMPARISON_YEAR = 2019;
+const COMPARISON_YEARS = YEARS.filter((optionYear) => optionYear < 2026);
 
 function clampSalary(value: number) {
   if (!Number.isFinite(value)) {
@@ -78,10 +79,12 @@ export function PayrollOnePage() {
   const comparison = useMemo(() => compareInflation(salary, comparisonYear), [salary, comparisonYear]);
   const control = useMemo(() => getControlSnapshot(year), [year]);
   const maxFlowValue = Math.max(payroll.laborCost, payroll.grossSalary, payroll.netSalary);
-  const comparedYearHasAdvantage = comparison.annualPurchasingPowerDelta >= 0;
-  const deltaLabel = comparedYearHasAdvantage
-    ? `Ventaja de ${comparisonYear} frente a 2026`
-    : `Ventaja de 2026 frente a ${comparisonYear}`;
+  const currentYearDelta = comparison.currentAnnualPurchasingPowerDelta;
+  const currentMonthlyDelta = comparison.currentMonthlyPurchasingPowerDelta;
+  const currentYearLosesNetSalary = currentYearDelta < 0;
+  const deltaLabel = currentYearLosesNetSalary
+    ? `Pérdida neta frente a ${comparisonYear}`
+    : `Mejora neta frente a ${comparisonYear}`;
 
   return (
     <main>
@@ -236,29 +239,29 @@ export function PayrollOnePage() {
           <p className="eyebrow">Comparativa IPC</p>
           <h2>El mismo salario visto en euros de 2026</h2>
           <p>
-            El salario actual se transforma al bruto nominal equivalente de cada año y luego se reexpresa en euros de
-            2026 para medir la diferencia de poder adquisitivo neto.
+            El salario de 2026 se compara contra el bruto nominal equivalente del año seleccionado, reexpresado en
+            euros de 2026. Si el resultado es negativo, has perdido salario neto frente a ese año.
           </p>
         </div>
 
         <div className="inflation-layout">
           <div className="control-panel slim">
             <label className="field">
-              <span>Año a comparar</span>
+              <span>Comparar 2026 frente a</span>
               <select value={comparisonYear} onChange={(event) => setComparisonYear(Number(event.target.value))}>
-                {YEARS.map((optionYear) => (
+                {COMPARISON_YEARS.map((optionYear) => (
                   <option key={optionYear} value={optionYear}>
                     {optionYear}
                   </option>
                 ))}
               </select>
             </label>
-            <div className="delta-badge" data-positive={comparedYearHasAdvantage}>
+            <div className="delta-badge" data-loss={currentYearLosesNetSalary}>
               <span>{deltaLabel}</span>
-              <strong>{formatEuro(Math.abs(comparison.annualPurchasingPowerDelta))}</strong>
+              <strong>{formatSignedEuro(currentYearDelta)}</strong>
               <small>
-                {comparisonYear} - 2026 = {formatSignedEuro(comparison.annualPurchasingPowerDelta)} al año ·{" "}
-                {formatSignedEuro(comparison.monthlyPurchasingPowerDelta)} al mes
+                2026 - {comparisonYear} = {formatSignedEuro(currentYearDelta)} al año ·{" "}
+                {formatSignedEuro(currentMonthlyDelta)} al mes
               </small>
             </div>
           </div>
@@ -270,8 +273,8 @@ export function PayrollOnePage() {
               value={formatPercent(comparison.inflationMultiplier - 1, 2)}
               tone="warning"
             />
-            <Metric label={`Neto ${comparisonYear} en euros 2026`} value={formatEuro(comparison.adjustedNet)} />
-            <Metric label="Neto equivalente con reglas 2026" value={formatEuro(comparison.net2026)} tone="positive" />
+            <Metric label={`Neto ${comparisonYear} actualizado a 2026`} value={formatEuro(comparison.adjustedNet)} />
+            <Metric label="Neto con reglas 2026" value={formatEuro(comparison.net2026)} tone="positive" />
           </div>
         </div>
       </section>
