@@ -1,0 +1,530 @@
+:root {
+  --ink: #111315;
+  --muted: #5d646c;
+  --line: #d9e0e3;
+  --paper: #fbfaf7;
+  --white: #ffffff;
+  --teal: #0f8b8d;
+  --teal-deep: #075b5d;
+  --coral: #e85d4f;
+  --amber: #c68a25;
+  --mint: #dff5ee;
+  --steel: #eef3f4;
+  --shadow: 0 24px 70px rgba(19, 33, 38, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+main {
+  overflow: hidden;
+}
+
+.hero-section {
+  position: relative;
+  min-height: 92vh;
+  display: grid;
+  align-items: center;
+  padding: 28px clamp(18px, 5vw, 76px) 56px;
+  isolation: isolate;
+}
+
+.hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(90deg, rgba(251, 250, 247, 0.95) 0%, rgba(251, 250, 247, 0.74) 42%, rgba(251, 250, 247, 0.15) 100%),
+    url("/hero-payroll-audit.png") center right / cover no-repeat;
+}
+
+.hero-media::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 28%;
+  content: "";
+  background: linear-gradient(180deg, rgba(251, 250, 247, 0), var(--paper));
+}
+
+.topbar {
+  position: absolute;
+  top: 24px;
+  right: clamp(18px, 5vw, 76px);
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid rgba(17, 19, 21, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+}
+
+.topbar a {
+  border-radius: 999px;
+  padding: 9px 15px;
+  color: #2d3439;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.topbar a:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.hero-content {
+  width: min(760px, 100%);
+  padding-top: 84px;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  color: var(--teal-deep);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  max-width: 980px;
+  letter-spacing: 0;
+  line-height: 0.98;
+}
+
+h1 {
+  font-size: clamp(3.2rem, 8vw, 7.7rem);
+}
+
+h2 {
+  font-size: clamp(2.1rem, 4.7vw, 4.5rem);
+}
+
+.hero-lede,
+.section-heading p {
+  color: var(--muted);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.65;
+}
+
+.hero-lede {
+  max-width: 650px;
+  margin: 28px 0 0;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.primary-action,
+.secondary-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 20px;
+  font-weight: 900;
+}
+
+.primary-action {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.secondary-action {
+  border: 1px solid rgba(17, 19, 21, 0.18);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.tool-section,
+.inflation-section,
+.method-section,
+.detail-band {
+  padding: 86px clamp(18px, 5vw, 76px);
+}
+
+.tool-section,
+.method-section {
+  background: var(--paper);
+}
+
+.section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+  gap: 28px;
+  align-items: end;
+  margin-bottom: 38px;
+}
+
+.section-heading.compact {
+  display: block;
+  margin-bottom: 26px;
+}
+
+.section-heading p {
+  margin: 0;
+}
+
+.calculator-layout,
+.inflation-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.control-panel,
+.results-panel {
+  border: 1px solid rgba(17, 19, 21, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.control-panel {
+  display: grid;
+  align-content: start;
+  gap: 22px;
+  padding: 22px;
+}
+
+.control-panel.slim {
+  box-shadow: none;
+}
+
+.field {
+  display: grid;
+  gap: 9px;
+}
+
+.field span {
+  color: #31383d;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  padding: 0 13px;
+  font-weight: 800;
+}
+
+.salary-range {
+  width: 100%;
+  accent-color: var(--teal);
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.year-grid button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.year-grid button.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.results-panel {
+  padding: 18px;
+}
+
+.metrics-grid,
+.comparison-grid,
+.breakdown-grid,
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric,
+.breakdown-card,
+.method-grid article {
+  min-height: 136px;
+  border: 1px solid rgba(17, 19, 21, 0.1);
+  border-radius: 8px;
+  background: var(--white);
+  padding: 18px;
+}
+
+.metric {
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+}
+
+.metric span,
+.breakdown-card span,
+.method-grid span,
+.bracket-item span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.metric strong,
+.breakdown-card strong,
+.method-grid strong {
+  color: var(--ink);
+  font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+  line-height: 1;
+}
+
+.metric-positive {
+  background: var(--mint);
+}
+
+.metric-warning {
+  background: #fff0df;
+}
+
+.flow-panel {
+  display: grid;
+  gap: 17px;
+  margin-top: 18px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #172126;
+  color: var(--white);
+}
+
+.flow-row {
+  display: grid;
+  gap: 8px;
+}
+
+.flow-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.flow-copy strong {
+  color: var(--white);
+}
+
+.flow-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.flow-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--teal), var(--coral), var(--amber));
+}
+
+.detail-band,
+.inflation-section {
+  background: var(--steel);
+}
+
+.breakdown-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.breakdown-card {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.breakdown-card p {
+  margin: 18px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.bracket-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.bracket-item {
+  display: grid;
+  gap: 8px;
+  min-height: 86px;
+  border: 1px solid rgba(17, 19, 21, 0.1);
+  border-radius: 8px;
+  background: var(--white);
+  padding: 14px;
+}
+
+.bracket-item strong {
+  font-size: 1.15rem;
+}
+
+.inflation-layout {
+  align-items: start;
+}
+
+.delta-badge {
+  display: grid;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 20px;
+  background: #2b2520;
+  color: var(--white);
+}
+
+.delta-badge[data-positive="true"] {
+  background: var(--teal-deep);
+}
+
+.delta-badge span {
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 850;
+}
+
+.delta-badge strong {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1;
+}
+
+.delta-badge small {
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 800;
+}
+
+.comparison-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.method-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.method-grid article {
+  display: grid;
+  align-content: space-between;
+  min-height: 124px;
+}
+
+@media (max-width: 980px) {
+  .hero-section {
+    min-height: 86vh;
+  }
+
+  .hero-media {
+    background:
+      linear-gradient(180deg, rgba(251, 250, 247, 0.94), rgba(251, 250, 247, 0.72)),
+      url("/hero-payroll-audit.png") center / cover no-repeat;
+  }
+
+  .section-heading,
+  .calculator-layout,
+  .inflation-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid,
+  .breakdown-grid,
+  .method-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    left: 18px;
+    right: 18px;
+    justify-content: center;
+  }
+
+  .topbar a {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+  .hero-section {
+    min-height: 780px;
+    align-items: end;
+    padding-bottom: 42px;
+  }
+
+  .hero-content {
+    padding-top: 110px;
+  }
+
+  h1 {
+    font-size: clamp(2.75rem, 16vw, 4.1rem);
+  }
+
+  .tool-section,
+  .inflation-section,
+  .method-section,
+  .detail-band {
+    padding: 58px 18px;
+  }
+
+  .metrics-grid,
+  .comparison-grid,
+  .breakdown-grid,
+  .method-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flow-copy {
+    display: grid;
+  }
+
+  .year-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
